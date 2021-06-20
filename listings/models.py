@@ -2,6 +2,17 @@ from django.db import models
 from datetime import datetime
 from realtors.models import Realtor
 
+class Lead(models.Model):
+  search_time = models.DateTimeField(default=datetime.now, blank=True)
+  keywords = models.CharField(max_length=200, default="")
+  city = models.CharField(max_length=100)
+  bedrooms = models.IntegerField(default=1)
+  state = models.CharField(max_length=100)
+  price = models.IntegerField(default = 1000)
+  user_id = models.IntegerField(blank=True)
+  def __str__(self):
+    return self.city+" "+self.state
+
 class Listing(models.Model):
   realtor = models.ForeignKey(Realtor, on_delete=models.DO_NOTHING)
   title = models.CharField(max_length=200)

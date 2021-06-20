@@ -1,8 +1,8 @@
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from .choices import price_choices, bedroom_choices, state_choices
 
-from .models import Listing
+from .models import Listing, Lead
 
 def index(request):
   listings = Listing.objects.order_by('-list_date').filter(is_published=True)
@@ -25,10 +25,29 @@ def listing(request, listing_id):
   }
 
   return render(request, 'listings/listing.html', context)
+def create(request):
+  if request.method == 'POST':
+    print(request.POST)
+    return redirect('listings')
+  context = {
+        'state_choices': state_choices,
+        'bedroom_choices': bedroom_choices,
+        'price_choices': price_choices
+    }
+  return render(request, 'listings/create.html', context)
+    
+    
+
+  #listing_obj = Listing(listing=listing, listing_id=listing_id, name=name, email=email, phone=phone, message=message, user_id=user_id )
+
+  #listing_obj.save()
+
+
 
 def search(request):
   queryset_list = Listing.objects.order_by('-list_date')
 
+  keywords, city, state, price, bedrooms = "", "all", "all", 1000, 2
   # Keywords
   if 'keywords' in request.GET:
     keywords = request.GET['keywords']
@@ -66,5 +85,9 @@ def search(request):
     'listings': queryset_list,
     'values': request.GET
   }
+  if request.user.is_authenticated:
+      user_id = request.user.id
+      lead = Lead(user_id = user_id, state=state, bedrooms = bedrooms, price=price, city=city, keywords=keywords)
+      lead.save()
 
   return render(request, 'listings/search.html', context)
