@@ -29,7 +29,7 @@
             <a class="nav-link" href="{% url 'about' %}">About</a>
           </li>
           <li
-            {% if 'listings' in request.path %}
+            {% if 'listings' == request.path %}
               class="nav-item active mr-3"
             {% else %}
               class="nav-item mr-3"
@@ -38,7 +38,7 @@
             <a class="nav-link" href="{% url 'listings' %}">Featured Listings</a>
           </li>
           <li
-            {% if 'create' == request.path %}
+            {% if 'create' in request.path %}
               class="nav-item active mr-3"
             {% else %}
               class="nav-item mr-3"

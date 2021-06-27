@@ -3,6 +3,7 @@ from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from .choices import price_choices, bedroom_choices, state_choices
 
 from .models import Listing, Lead
+from realtors.models import Realtor
 
 def index(request):
   listings = Listing.objects.order_by('-list_date').filter(is_published=True)
@@ -26,8 +27,36 @@ def listing(request, listing_id):
 
   return render(request, 'listings/listing.html', context)
 def create(request):
+  '''
+  realtor = models.ForeignKey(Realtor, on_delete=models.DO_NOTHING)
+  title = models.CharField(max_length=200)
+  address = models.CharField(max_length=200)
+  city = models.CharField(max_length=100)
+  state = models.CharField(max_length=100)
+  zipcode = models.CharField(max_length=20)
+  description = models.TextField(blank=True)
+  price = models.DecimalField(max_digits=4, decimal_places=1)
+  bedrooms = models.IntegerField()
+  bathrooms = models.IntegerField(default=0)
+  garage = models.IntegerField(default=0)
+  sqft = models.IntegerField()
+  lot_size = models.IntegerField(default=0)
+  photo_main = models.ImageField(upload_to='photos/%Y/%m/%d/')
+  '''
+  '''
+  'title': [''], 'address': [''], 'city': [''], 'zipcode': [''], 'description': [''], 'bathrooms': [''], 'garage': [''], 'sqft': [''], 'lotsize': [''], 'photos': ['home.jpeg']}
+  '''
+  print(request.user)
+
+  if not request.user.is_authenticated:
+    return render(request, 'listings/create.html', context)
   if request.method == 'POST':
     print(request.POST)
+    print(request.POST)
+    print(request.FILES['photos'])
+    realtor = Realtor.objects.all()
+    listing_obj = Listing(title=request.POST['title'], address=request.POST['address'], city=request.POST['city'], state=request.POST['state'], price=int(request.POST['price']), zipcode=int(request.POST['zipcode']), description=request.POST['description'], bedrooms=int(request.POST['bedrooms']), bathrooms=int(request.POST['bathrooms']), garage=int(request.POST['garage']), sqft=int(request.POST['sqft']), photo_main=request.FILES['photos'],  )
+    listing_obj.save()
     return redirect('listings')
   context = {
         'state_choices': state_choices,
@@ -38,7 +67,7 @@ def create(request):
     
     
 
-  #listing_obj = Listing(listing=listing, listing_id=listing_id, name=name, email=email, phone=phone, message=message, user_id=user_id )
+  
 
   #listing_obj.save()
 
