@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from .choices import price_choices, bedroom_choices, state_choices
+from django.contrib import messages, auth
 
 from .models import Listing, Lead
 from realtors.models import Realtor
@@ -52,11 +53,16 @@ def create(request):
     return render(request, 'listings/create.html', context)
   if request.method == 'POST':
     print(request.POST)
-    print(request.POST)
     print(request.FILES['photos'])
-    realtor = Realtor.objects.all()
-    listing_obj = Listing(title=request.POST['title'], address=request.POST['address'], city=request.POST['city'], state=request.POST['state'], price=int(request.POST['price']), zipcode=int(request.POST['zipcode']), description=request.POST['description'], bedrooms=int(request.POST['bedrooms']), bathrooms=int(request.POST['bathrooms']), garage=int(request.POST['garage']), sqft=int(request.POST['sqft']), photo_main=request.FILES['photos'],  )
-    listing_obj.save()
+    
+    try:
+      realtor = Realtor.objects.get(user_id = request.user.id)
+      print(realtor)
+      listing_obj = Listing(realtor=realtor, title=request.POST['title'], address=request.POST['address'], city=request.POST['city'], state=request.POST['state'], price=int(request.POST['price']), zipcode=int(request.POST['zipcode']), description=request.POST['description'], bedrooms=int(request.POST['bedrooms']), bathrooms=int(request.POST['bathrooms']), garage=int(request.POST['garage']), sqft=int(request.POST['sqft']), photo_main=request.FILES['photos'],  )
+      listing_obj.save()
+    except:
+      messages.error(request, 'You are not a realtor, please contact admin')
+      return redirect('listings')
     return redirect('listings')
   context = {
         'state_choices': state_choices,
